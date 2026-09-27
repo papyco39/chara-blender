@@ -233,6 +233,12 @@ main{max-width:700px;margin:auto;padding:34px 14px 56px}
 .prop-card > .actions{position:absolute!important;right:8px!important;top:50%!important;transform:translateY(-50%)!important;width:30px!important;height:30px!important;display:flex!important;align-items:center!important;justify-content:center!important}
 .prop-card > .actions button{width:30px!important;height:30px!important;min-width:30px!important;max-width:30px!important;padding:0!important;flex:0 0 30px!important}
 </style>
+
+<style id="mobile-text-wrap-fix">
+.prop-card .prop-value:not(.prop-color-value){white-space:normal !important;overflow:visible !important;text-overflow:clip !important;overflow-wrap:anywhere !important;word-break:normal !important;line-height:1.35 !important;min-height:24px !important;padding-right:0 !important;}
+.prop-card{min-width:0 !important;padding-right:40px !important;}
+@media(max-width:520px){.prop-card{padding-right:38px !important;}.prop-card .prop-value:not(.prop-color-value){font-size:12.5px !important;line-height:1.4 !important;}}
+</style>
 </head><body><main><div class="hero-title">CHARA BLENDER</div><div class="hero-sub">― 運命に任せて、ひとりのキャラクターを召喚。 ―</div><div class="gender-box"><div class="gender-label">性別を選ぶ</div><div class="gender-buttons"><button class="gender-btn" data-gender="male">男性</button><button class="gender-btn" data-gender="female">女性</button><button class="gender-btn" data-gender="random">ランダム</button></div></div><button class="draw" id="draw">⭐ 召喚する ⭐</button>
 <section class="card" id="result"></section></main>
 
