@@ -1,0 +1,516 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CHARA BLENDER ― 運命に任せて、ひとりのキャラクターを召喚。 ―</title><style>
+body{margin:0;background:#f8f4f6;color:#29252a;font-family:system-ui,-apple-system,sans-serif}main{max-width:700px;margin:auto;padding:20px 14px 50px}.hero{text-align:center}.hero h1{font-size:24px}.hero p{color:#777}.draw,.sub button,.copy{width:100%;padding:14px;border-radius:14px;border:1px solid #e7dfe3;background:white;font-weight:700}.draw{background:#29252a;color:white;border:0;font-size:16px}.sub{display:flex;gap:8px;margin-top:8px}.sub button{font-size:12px}.card{background:white;border:1px solid #e7dfe3;border-radius:18px;padding:15px;margin-top:14px}.row{display:grid;grid-template-columns:1fr 70px;gap:8px;padding:11px 0;border-bottom:1px solid #eee;position:relative}.name{font-size:11px;color:#888}.value{font-weight:700;margin-top:3px}.lock{border:0;border-radius:9px;background:#f1edef}.lock.on{background:#29252a;color:white}.color-title{font-size:12px;font-weight:800;margin:16px 0 4px}.color-line{margin-top:6px}.colorbox{display:flex;align-items:center;gap:8px}.swatch{height:30px;width:76px;border-radius:7px;border:1px solid #ddd}.hex{font-size:10px;color:#888}.color-row .value{display:flex}.copy{margin-top:10px;cursor:pointer;transition:transform .12s ease,background .12s ease,box-shadow .12s ease}.copy:active{transform:scale(.98)}.copy.copied{background:#29252a;color:#fff;border-color:#29252a;box-shadow:0 2px 8px rgba(0,0,0,.12)}.copy.copy-error{background:#f5e9ed}.attr{font-size:22px;font-weight:900}.tag{font-size:11px;background:#f1e5eb;border-radius:99px;padding:4px 8px}.label{font-size:10px;color:#888}
+</style>
+<style>
+.gender-box{margin:10px 0 10px}.gender-label{font-size:11px;font-weight:800;letter-spacing:.08em;margin-bottom:7px}.gender-buttons{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}.gender-btn{border:1px solid #ddd;background:#fff;border-radius:10px;padding:10px 6px;font-weight:700;cursor:pointer}.gender-btn.selected{background:#222;color:#fff;border-color:#222}.color-value{display:flex;align-items:center;gap:8px}.color-value small{color:#888;font-size:10px}.swatch{display:inline-block;width:28px;height:28px;border-radius:6px;border:1px solid #ddd;vertical-align:middle}.hero-title{text-align:center;font-weight:900;font-size:24px;letter-spacing:.04em;margin-bottom:2px}.hero-sub{text-align:center;font-size:11px;color:#777;margin-bottom:12px}
+</style>
+<style>
+.gender-box{margin:14px 0 16px}
+.gender-label{font-size:12px;font-weight:800;margin-bottom:7px}
+.gender-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.gender-btn{border:1px solid #ddd;background:#fff;border-radius:10px;padding:10px 6px;font-weight:700}
+.gender-btn.selected{background:#222;color:#fff;border-color:#222}
+
+.color-title{font-size:12px;font-weight:800;margin:16px 0 8px}
+.color-roles{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:5px}.color-palette{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:8px}
+.color-chip{height:42px;border-radius:9px;border:1px solid #ddd}
+
+.color-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;align-items:start}
+.color-card{text-align:center;min-width:0;position:relative;padding-bottom:2px}
+.color-role{font-size:10px;font-weight:800;text-align:center}
+.color-name{font-size:10px;line-height:1.2;min-height:24px;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.color-code{font-size:9px;color:#888;margin:3px 0 5px}
+.color-card .lock{margin:auto}
+
+.prop-title{font-size:12px;font-weight:800;margin:16px 0 8px}
+.prop-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #e5e5e5}
+.prop-card{border:0;border-radius:0;padding:8px 42px 8px 0;text-align:left;position:relative;min-height:48px;min-width:0}
+.prop-label{font-size:9px;color:#888;margin-bottom:2px}
+.prop-value{font-size:13px;font-weight:800;min-height:24px;display:flex;align-items:center;justify-content:flex-start;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.prop-color-value{display:grid;grid-template-columns:18px minmax(0,1fr) auto;align-items:center;column-gap:7px;width:calc(100% - 4px);min-width:0;padding:0;overflow:hidden}.mini-swatch{display:block;width:18px;height:18px;min-width:18px;max-width:18px;flex:none;border-radius:4px;border:1px solid rgba(0,0,0,.16);box-sizing:border-box;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}.prop-color-name{font-size:13px;font-weight:800;line-height:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.prop-color-hex{font-size:9px;font-weight:600;color:#888;line-height:18px;white-space:nowrap;flex:none}
+.prop-card .lock{position:absolute;right:8px;top:50%;transform:translateY(-50%);margin:0;width:38px;height:38px;padding:0;font-size:13px}
+.prop-card:nth-child(2){padding-left:12px;border-left:1px solid #e5e5e5;min-width:0}
+
+@media(max-width:360px){
+  .color-grid{gap:3px}.color-name{font-size:9px}.color-code{font-size:8px}
+  .color-chip{height:36px}
+}
+</style>
+<style>
+.actions{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;gap:4px;align-items:center}
+.actions button{position:static !important;transform:none !important;width:32px;height:32px;padding:0;border:0;border-radius:9px;background:#f1eef2;font-size:12px;cursor:pointer}
+.actions .lock.on{background:#e8e2e8}
+.reroll-one:active,.lock:active{transform:scale(.96)}
+.color-card .actions{position:static;transform:none;justify-content:center;margin-top:5px}
+.prop-card .actions{right:8px}
+.prop-card .actions button{position:static !important;transform:none !important;width:32px;height:32px}
+</style><style>
+.color-title-row{display:flex;align-items:center;justify-content:space-between;margin:16px 0 4px}
+.color-title-row .color-title{margin:0}
+.palette-reroll{width:32px;height:32px;padding:0;border:0;border-radius:9px;background:#f1eef2;font-size:12px;cursor:pointer}
+.palette-reroll:active{transform:scale(.96)}
+</style>
+<style>
+:root{--bg:#f3f5f8;--surface:#ffffff;--surface-2:#f8f9fb;--ink:#16181d;--muted:#7b8190;--line:#e3e7ee;--accent:#4f46e5;--accent-2:#6366f1;--accent-soft:#eef0ff;--dark:#17191f;--shadow:0 12px 34px rgba(20,24,40,.07)}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#f8f9fb 0%,var(--bg) 100%);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.01em}
+main{max-width:720px;margin:auto;padding:28px 16px 56px}
+.hero-title{font-size:clamp(27px,7vw,38px)!important;letter-spacing:.12em!important;font-weight:950!important;color:#111318!important;margin:8px 0 5px!important}
+.hero-sub{font-size:11px!important;color:#8a90a0!important;letter-spacing:.08em;margin-bottom:18px!important}
+.draw{background:linear-gradient(135deg,#17191f,#30333d)!important;border:0!important;border-radius:16px!important;box-shadow:0 10px 24px rgba(20,22,30,.18)!important;font-size:16px!important;letter-spacing:.06em;padding:16px!important;transition:transform .15s,box-shadow .15s!important}
+.draw:hover{box-shadow:0 14px 30px rgba(20,22,30,.22)!important;transform:translateY(-1px)}
+.draw:active{transform:translateY(1px) scale(.995)!important}
+.gender-box{margin:18px 0 14px!important}
+.gender-label{font-size:11px!important;letter-spacing:.12em!important;color:#676d7a!important;margin-bottom:8px!important}
+.gender-buttons{gap:8px!important}
+.gender-btn{border:1px solid var(--line)!important;background:rgba(255,255,255,.88)!important;color:#30343d!important;border-radius:12px!important;padding:11px 6px!important;box-shadow:0 2px 8px rgba(20,24,40,.03);transition:.15s}
+.gender-btn:hover{border-color:#bfc5d5!important;background:#fff!important}
+.gender-btn.selected{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important;box-shadow:0 7px 16px rgba(79,70,229,.2)}
+.card{background:rgba(255,255,255,.94)!important;border:1px solid var(--line)!important;border-radius:16px!important;padding:16px!important;margin-top:14px!important;box-shadow:var(--shadow)!important}
+.row{padding:13px 0!important;border-bottom:1px solid #edf0f4!important}
+.name,.prop-label{color:#8a909d!important;letter-spacing:.06em}
+.value,.prop-value{color:#1c1f26!important}
+.actions button,.palette-reroll{background:#f1f3f7!important;color:#565c69!important;border:1px solid #e4e7ed!important;border-radius:9px!important;transition:.14s!important}
+.actions button:hover,.palette-reroll:hover{background:var(--accent-soft)!important;color:var(--accent)!important;border-color:#cfd3ff!important}
+.actions button:active,.palette-reroll:active{transform:scale(.94)!important}
+.prop-grid{border-bottom:1px solid #edf0f4!important}
+.prop-card:nth-child(2){border-left:1px solid #edf0f4!important}
+.color-title-row{margin:20px 0 8px!important}
+.color-title,.prop-title{font-size:11px!important;letter-spacing:.1em!important;color:#5f6572!important}
+.palette-reroll{width:31px!important;height:31px!important}
+.color-grid{gap:8px!important}
+.color-chip{height:46px!important;border-radius:10px!important;border:1px solid rgba(20,24,40,.1)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28),0 3px 8px rgba(20,24,40,.06)}
+.color-role{font-size:9px!important;letter-spacing:.1em;color:#737987!important}
+.color-name{font-weight:800!important;color:#252934!important}
+.color-code{color:#969ba6!important}
+
+.copy{border:1px solid var(--line)!important;background:#fff!important;color:#252934!important;border-radius:12px!important;box-shadow:0 3px 10px rgba(20,24,40,.04);transition:.15s!important}
+.copy:hover{border-color:#c9cdfd!important;background:#f8f8ff!important;color:#4338ca!important}
+.copy.copied{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important;box-shadow:0 8px 18px rgba(79,70,229,.2)!important}
+.tag{background:var(--accent-soft)!important;color:#5148b8!important}
+@media(max-width:480px){main{padding:22px 12px 44px}.hero-title{font-size:28px!important}.card{padding:14px!important}.prop-card{padding-right:38px!important}.prop-card:nth-child(2){padding-left:10px!important}}
+</style>
+<style>
+/* v30 color fields */
+.color-field{padding-right:8px!important;min-width:0!important;}
+.color-field .color-inline{display:flex;align-items:center;gap:7px;min-width:0;height:32px;}
+.color-field .prop-color-name{display:block;flex:1 1 auto;min-width:0;max-width:none;font-size:12px!important;font-weight:800;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;word-break:keep-all;}
+.color-field .mini-swatch{display:block;flex:0 0 20px!important;width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;border-radius:4px!important;border:1px solid rgba(0,0,0,.14);box-sizing:border-box;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),0 2px 5px rgba(20,24,40,.10);}
+.color-field .actions{position:static!important;transform:none!important;display:flex!important;align-items:center!important;flex:0 0 28px!important;width:28px!important;height:28px!important;margin-left:0!important;}
+.color-field .actions button{width:28px!important;height:28px!important;border-radius:8px!important;font-size:11px!important;flex:0 0 28px!important;}
+@media(max-width:480px){.color-field .color-inline{gap:6px}.color-field .prop-color-name{font-size:11.5px!important}.color-field .mini-swatch{width:18px!important;height:18px!important;min-width:18px!important;max-width:18px!important}.color-field .actions,.color-field .actions button{width:27px!important;height:27px!important;flex-basis:27px!important}}
+</style>
+
+<style>
+/* v31: color field layout — name -> swatch -> reroll */
+.color-field .color-inline{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 20px 32px !important;
+  align-items:center !important;
+  column-gap:8px !important;
+  width:100% !important;
+  min-width:0 !important;
+  height:32px !important;
+  overflow:visible !important;
+}
+.color-field .prop-color-name{
+  display:block !important;
+  width:auto !important;
+  min-width:0 !important;
+  max-width:none !important;
+  flex:none !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+  word-break:normal !important;
+  font-size:13px !important;
+  line-height:20px !important;
+  font-weight:800 !important;
+}
+.color-field .mini-swatch{
+  display:block !important;
+  width:20px !important;
+  height:20px !important;
+  min-width:20px !important;
+  max-width:20px !important;
+  border-radius:4px !important;
+  box-sizing:border-box !important;
+}
+.color-field .actions{
+  position:static !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  width:32px !important;
+  height:32px !important;
+  min-width:32px !important;
+  margin:0 !important;
+  flex:none !important;
+  transform:none !important;
+}
+.color-field .actions button{
+  width:32px !important;
+  height:32px !important;
+  min-width:32px !important;
+  padding:0 !important;
+  flex:none !important;
+}
+@media(max-width:480px){
+  .color-field .color-inline{grid-template-columns:minmax(0,1fr) 18px 29px !important;column-gap:6px !important;}
+  .color-field .mini-swatch{width:18px !important;height:18px !important;min-width:18px !important;max-width:18px !important;}
+  .color-field .actions,.color-field .actions button{width:29px !important;height:29px !important;min-width:29px !important;}
+  .color-field .prop-color-name{font-size:12px !important;}
+}
+</style>
+<style>
+/* CHARA BLENDER — refined header / control area */
+:root{--bg:#f6f7fb;--surface:#ffffff;--ink:#161922;--muted:#7b8190;--line:#e4e7ef;--accent:#4f46e5;--accent2:#6366f1;--dark:#1d2029}
+body{background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:700px;margin:auto;padding:34px 14px 56px}
+.hero-title{font-size:36px!important;line-height:1.05;font-weight:950!important;letter-spacing:.09em!important;color:#10131a;margin:0 0 8px!important;text-align:center}
+.hero-sub{font-size:12px!important;letter-spacing:.04em;color:#8a8f9d!important;margin:0 0 18px!important;text-align:center}
+.hero{display:none!important}
+.gender-box{background:rgba(255,255,255,.94);border:1px solid var(--line);box-shadow:0 8px 24px rgba(31,35,48,.06);padding:10px 10px 8px;margin:0 0 14px!important}
+.gender-label{font-size:10px!important;font-weight:800!important;letter-spacing:.08em!important;color:#4d5361;margin:0 0 7px!important}
+.gender-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:7px!important}
+.gender-btn{height:43px;border:1px solid #dfe3eb!important;background:#fff!important;color:#20242d!important;border-radius:10px!important;font-size:12px;font-weight:800!important;box-shadow:0 1px 2px rgba(20,24,35,.03);transition:.16s ease}
+.gender-btn:hover{border-color:#b9bdf4!important;transform:translateY(-1px)}
+.gender-btn.selected{background:linear-gradient(135deg,var(--accent),var(--accent2))!important;color:#fff!important;border-color:transparent!important;box-shadow:0 7px 18px rgba(79,70,229,.22)!important}
+.draw{height:56px;width:100%;margin:0!important;border:0!important;border-radius:16px!important;background:linear-gradient(135deg,#171a22,#272b36)!important;color:#fff!important;font-size:16px!important;font-weight:850!important;letter-spacing:.02em;box-shadow:0 10px 22px rgba(22,25,34,.14);transition:transform .14s ease,box-shadow .14s ease}
+.draw:hover{transform:translateY(-1px);box-shadow:0 13px 26px rgba(22,25,34,.18)}
+.draw:active{transform:translateY(1px) scale(.99);box-shadow:0 5px 12px rgba(22,25,34,.14)}
+.card{background:var(--surface)!important;border:1px solid var(--line)!important;border-radius:18px!important;box-shadow:0 8px 26px rgba(31,35,48,.055);padding:15px!important;margin-top:16px!important}
+@media(max-width:520px){main{padding:28px 12px 46px}.hero-title{font-size:29px!important}.hero-sub{font-size:11px!important}.gender-box{padding:9px 8px 7px}.gender-btn{height:42px}.draw{height:54px}}
+</style>
+
+<style id="final-ui-fix">
+.gender-box{margin:14px 0 12px!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.gender-label{margin:0 0 7px!important;font-size:11px!important}
+.gender-buttons{display:flex!important;gap:7px!important;justify-content:flex-start!important}
+.gender-btn{flex:0 1 120px!important;height:38px!important;padding:0 14px!important;font-size:13px!important;border-radius:10px!important}
+
+/* Color field: name -> swatch -> reroll */
+.color-field{padding-right:42px!important;min-width:0!important}
+.color-inline{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important;height:30px!important;white-space:nowrap!important}
+.color-inline .prop-color-name{display:block!important;flex:0 0 auto!important;width:auto!important;min-width:0!important;max-width:none!important;overflow:visible!important;text-overflow:clip!important;white-space:nowrap!important;font-size:13px!important;font-weight:800!important;line-height:20px!important}
+.color-inline .mini-swatch{display:block!important;flex:0 0 20px!important;width:20px!important;min-width:20px!important;height:20px!important;border-radius:4px!important;box-sizing:border-box!important}
+.color-inline .actions{position:static!important;display:flex!important;flex:0 0 auto!important;margin:0!important;transform:none!important}
+.color-inline .actions button{width:30px!important;height:30px!important}
+@media(max-width:520px){.gender-buttons{gap:6px!important}.gender-btn{flex:1 1 0!important;max-width:none!important;padding:0 8px!important}}
+</style>
+<style>
+/* v34 */
+.gender-box{background:rgba(255,255,255,.94)!important;border:1px solid var(--line)!important;box-shadow:0 8px 24px rgba(31,35,48,.06)!important;padding:10px 10px 8px!important;margin:0 0 14px!important}
+.gender-label{font-size:10px!important;font-weight:800!important;letter-spacing:.08em!important;color:#4d5361!important;margin:0 0 7px!important}
+.gender-buttons{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:7px!important}
+.gender-btn{height:43px!important;border:1px solid #dfe3eb!important;background:#fff!important;color:#20242d!important;border-radius:10px!important;font-size:12px!important;font-weight:800!important;box-shadow:0 1px 2px rgba(20,24,35,.03)!important;transition:.16s ease}
+.gender-btn:hover{border-color:#b9bdf4!important;transform:translateY(-1px)}
+.gender-btn.selected{background:linear-gradient(135deg,var(--accent),var(--accent2))!important;color:#fff!important;border-color:transparent!important;box-shadow:0 7px 18px rgba(79,70,229,.22)!important}
+.color-field{min-width:0!important;padding-right:8px!important}
+.color-field .color-inline{display:flex!important;align-items:center!important;gap:8px!important;width:100%!important;min-width:0!important;height:32px!important;overflow:visible!important}
+.color-field .color-box-name{display:block!important;flex:1 1 auto!important;min-width:0!important;width:auto!important;max-width:none!important;font-size:13px!important;font-weight:800!important;line-height:20px!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;word-break:normal!important;writing-mode:horizontal-tb!important;letter-spacing:normal!important}
+.color-field .color-box-swatch{display:block!important;flex:0 0 20px!important;width:20px!important;height:20px!important;border-radius:4px!important;border:1px solid rgba(0,0,0,.14)!important;box-sizing:border-box!important}
+.color-field .actions{position:static!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 30px!important;width:30px!important;height:30px!important;margin:0!important;transform:none!important}
+.color-field .actions button{width:30px!important;height:30px!important;flex:0 0 30px!important;padding:0!important}
+@media(max-width:520px){.gender-box{padding:9px 8px 7px!important}.gender-btn{height:42px!important}}
+</style>
+
+<style>
+/* Final color field layout: one label, fixed swatch, one reroll button */
+.color-field{min-width:0!important;padding-right:42px!important}
+.color-fixed{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important;height:30px!important;white-space:nowrap!important;overflow:visible!important}
+.color-fixed .color-box-name{display:block!important;flex:0 1 auto!important;min-width:0!important;max-width:calc(100% - 32px)!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:13px!important;font-weight:800!important;line-height:20px!important}
+.color-fixed .color-box-swatch{display:block!important;flex:0 0 20px!important;width:20px!important;min-width:20px!important;height:20px!important;border-radius:4px!important;border:1px solid rgba(0,0,0,.14)!important;box-sizing:border-box!important;pointer-events:none!important}
+.prop-card > .actions{position:absolute!important;right:8px!important;top:50%!important;transform:translateY(-50%)!important;width:30px!important;height:30px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.prop-card > .actions button{width:30px!important;height:30px!important;min-width:30px!important;max-width:30px!important;padding:0!important;flex:0 0 30px!important}
+</style>
+
+<style>
+/* Fixed color display: swatches are display-only, not interactive. */
+.color-fixed{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important;width:100%!important;height:30px!important;white-space:nowrap!important;overflow:hidden!important;box-sizing:border-box!important}
+.color-fixed .color-box-name{display:block!important;flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:13px!important;font-weight:800!important;line-height:20px!important}
+.color-fixed .color-box-swatch{display:block!important;flex:0 0 20px!important;width:20px!important;min-width:20px!important;height:20px!important;border-radius:4px!important;border:1px solid rgba(0,0,0,.14)!important;box-sizing:border-box!important;pointer-events:none!important;user-select:none!important}
+.prop-card{position:relative!important;min-width:0!important}
+.prop-card > .actions{position:absolute!important;right:8px!important;top:50%!important;transform:translateY(-50%)!important;width:30px!important;height:30px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.prop-card > .actions button{width:30px!important;height:30px!important;min-width:30px!important;max-width:30px!important;padding:0!important;flex:0 0 30px!important}
+</style>
+</head><body><main><div class="hero-title">CHARA BLENDER</div><div class="hero-sub">― 運命に任せて、ひとりのキャラクターを召喚。 ―</div><div class="gender-box"><div class="gender-label">性別を選ぶ</div><div class="gender-buttons"><button class="gender-btn" data-gender="male">男性</button><button class="gender-btn" data-gender="female">女性</button><button class="gender-btn" data-gender="random">ランダム</button></div></div><button class="draw" id="draw">⭐ 召喚する ⭐</button>
+<section class="card" id="result"></section></main>
+
+<script>
+const DATA = {
+  male: {},
+  female: {},
+  common: {
+    種族: [
+      "人間","エルフ","ダークエルフ","ハーフエルフ","ドワーフ",
+      "猫獣人","犬獣人","狐獣人","狼獣人","兎獣人","虎獣人","熊獣人","蛇獣人","鳥人",
+      "竜人","ドラゴン","人魚","セイレーン","妖精","精霊","妖怪","鬼",
+      "天使","堕天使","悪魔","吸血鬼","死神","神",
+      "人造人間","ホムンクルス","人形","ゴーレム","サイボーグ","アンドロイド","ゾンビ","幽霊"
+    ],
+    役職: [
+      "国王・女王","皇帝","皇族","王子・王女","貴族","名家の子息・令嬢","当主","御曹司",
+      "マフィアのボス","マフィア幹部","組長","若頭","組織の幹部","頭領","情報屋","暗殺者","用心棒","密売人",
+      "騎士団長","騎士","護衛","傭兵","狩人","忍者","エージェント",
+      "魔術師","大魔導士","錬金術師","神官","聖職者","冒険者",
+      "社長","医者","看護師","警察官","刑事","弁護士","教師","学生","探偵",
+      "俳優・女優","アイドル","モデル","歌手","ダンサー","作家","漫画家","イラストレーター",
+      "音楽家・作曲家","芸術家","カメラマン","映画監督","デザイナー","メイド","執事"
+    ],
+    目: [
+      "切れ長","垂れ目","涼しげな目","鋭い目","伏し目がち",
+      "眠たげな目","細めの目","柔らかな目","三白眼","大きく印象的な目"
+    ],
+    服装スタイル: [
+      "モード系","クラシック","ストリート","テックウェア","カジュアル",
+      "フォーマル","スーツスタイル","プレッピー","ヴィンテージ","ロック",
+      "パンク","ゴシック","ゴシックロリータ","ミニマル","スポーティ",
+      "ミリタリー","軍服","和装","和モダン","チャイナスタイル",
+      "王侯貴族風","ファンタジー衣装","ダークファンタジー",
+      "スチームパンク","サイバーパンク"
+    ],
+    髪型: [
+      ["ベリーショート","前髪なし","ストレート"],
+      ["ベリーショート","斜め分け","ナチュラルレイヤー"],
+      ["ベリーショート","長めの前髪","無造作ヘア"],
+      ["ショート","前髪なし","ストレート"],
+      ["ショート","センターパート","ナチュラルレイヤー"],
+      ["ショート","斜め分け","レイヤー"],
+      ["ショート","目にかかる前髪","ウルフ"],
+      ["ショート","無造作な前髪","無造作ヘア"],
+      ["ショート","片目を隠す前髪","ウルフ"],
+      ["ショート","ぱっつん前髪","切りっぱなし"],
+      ["ショートボブ","ぱっつん前髪","ストレート"],
+      ["ショートボブ","シースルーバング","ナチュラルレイヤー"],
+      ["ショートボブ","斜め分け","外ハネ"],
+      ["ショートボブ","前髪なし","内巻き"],
+      ["ボブ","ぱっつん前髪","切りっぱなし"],
+      ["ボブ","シースルーバング","内巻き"],
+      ["ボブ","センターパート","外ハネ"],
+      ["ボブ","斜め分け","ナチュラルレイヤー"],
+      ["ボブ","長めの前髪","ゆるいウェーブ"],
+      ["ボブ","片目を隠す前髪","無造作ヘア"],
+      ["ミディアム","前髪なし","ストレート"],
+      ["ミディアム","センターパート","ナチュラルレイヤー"],
+      ["ミディアム","シースルーバング","ゆるいウェーブ"],
+      ["ミディアム","ぱっつん前髪","内巻き"],
+      ["ミディアム","斜め分け","外ハネ"],
+      ["ミディアム","長めの前髪","シャギー"],
+      ["ミディアム","目にかかる前髪","無造作ヘア"],
+      ["ミディアム","無造作な前髪","くせ毛"],
+      ["ミディアム","センターパート","ウルフ"],
+      ["ミディアム","シースルーバング","外ハネ"],
+      ["セミロング","前髪なし","ストレート"],
+      ["セミロング","センターパート","ナチュラルレイヤー"],
+      ["セミロング","シースルーバング","ゆるいウェーブ"],
+      ["セミロング","ぱっつん前髪","内巻き"],
+      ["セミロング","斜め分け","シャギー"],
+      ["セミロング","長めの前髪","強めのウェーブ"],
+      ["セミロング","目にかかる前髪","無造作ヘア"],
+      ["セミロング","シースルーバング","外ハネ"],
+      ["セミロング","センターパート","くせ毛"],
+      ["セミロング","片目を隠す前髪","ゆるいウェーブ"],
+      ["ロング","前髪なし","ストレート"],
+      ["ロング","センターパート","ナチュラルレイヤー"],
+      ["ロング","シースルーバング","ゆるいウェーブ"],
+      ["ロング","ぱっつん前髪","ストレート"],
+      ["ロング","斜め分け","強めのウェーブ"],
+      ["ロング","長めの前髪","シャギー"],
+      ["ロング","目にかかる前髪","無造作ヘア"],
+      ["ロング","片目を隠す前髪","ストレート"],
+      ["ロング","前髪なし","強めのウェーブ"],
+      ["ロング","シースルーバング","外ハネ"],
+      ["スーパーロング","前髪なし","ストレート"],
+      ["スーパーロング","センターパート","ゆるいウェーブ"],
+      ["スーパーロング","シースルーバング","ストレート"],
+      ["スーパーロング","ぱっつん前髪","ゆるいウェーブ"],
+      ["スーパーロング","斜め分け","強めのウェーブ"],
+      ["スーパーロング","長めの前髪","ナチュラルレイヤー"],
+      ["ショート","センターパート","シャギー"],
+      ["ショート","長めの前髪","ナチュラルレイヤー"],
+      ["ボブ","シースルーバング","外ハネ"],
+      ["ミディアム","前髪なし","シャギー"],
+      ["ミディアム","センターパート","強めのウェーブ"],
+      ["セミロング","前髪なし","ナチュラルレイヤー"],
+      ["セミロング","ぱっつん前髪","ストレート"],
+      ["ロング","センターパート","シャギー"],
+      ["ロング","斜め分け","ゆるいウェーブ"],
+      ["スーパーロング","前髪なし","ナチュラルレイヤー"]
+    ],
+    小物: [
+      "なし","メガネ","モノクル","イヤーカフ","ピアス","チョーカー",
+      "ネックレス","ペンダント","指輪","ブレスレット","腕時計","懐中時計",
+      "ネクタイピン","カフスボタン","ヘアピン","ヘアクリップ","リボン",
+      "スカーフ","ストール","マスク","手袋","本","万年筆","手紙","花束",
+      "傘","扇子","杖","スマートフォン","カメラ","ヘッドホン","マイク",
+      "コーヒーカップ","ワイングラス","トランプ","タロットカード","魔導書",
+      "魔法石","水晶","小瓶","羽根ペン","お守り","聖印","数珠","ロザリオ",
+      "チャーム","巾着袋","宝石","古いコイン","鍵","キーホルダー","レコード",
+      "カセットテープ","チェスの駒","古い写真","ぬいぐるみ","ピンバッジ",
+      "フィルムカメラ","手帳","ペンダントウォッチ","オルゴール"
+    ],
+    性格: [
+      "冷静沈着で落ち着いている","クールで無口","飄々としていて掴みどころがない",
+      "高飛車で自信に満ちている","強気で勝ち気","毒舌で皮肉屋","無愛想で他人と距離を置く",
+      "ミステリアスで本心を見せない","真面目で几帳面","頭脳明晰で合理的","温厚で穏やか",
+      "包容力があり大らか","面倒見がよく世話焼き","優しく気遣い上手","人懐っこく誰とでも打ち解ける",
+      "明るく陽気で楽観的","無邪気で好奇心旺盛","おっとりしていてマイペース",
+      "天然で少し抜けている","愛嬌があり親しみやすい","豪快で細かいことを気にしない",
+      "自由奔放で行動力がある","野心的で上昇志向が強い","完璧主義で妥協を許さない",
+      "慎重で用心深い","頑固で自分の信念を曲げない","情熱的で感情表現が豊か",
+      "素直で裏表がない","人見知りで他人と打ち解けるのが苦手",
+      "洞察力が鋭く、人の本質を見抜く","常に余裕ぶっている","人の反応を見るのが好き",
+      "他人を試すような言動が多い","自分の美学を何より優先する","気に入ったものには異常に執着する",
+      "人の懐に入るのが異様に上手い","相手を翻弄することを楽しむ",
+      "危険な状況ほど楽しそうにする","他人の常識に興味がない","享楽的で刹那的"
+    ],
+    ギャップ: [
+      "とことん甘い","不器用になる","素直になる","素直になれない","甘えん坊になる",
+      "過保護になる","世話を焼きたがる","独占欲が強くなる","嫉妬深くなる","途端に余裕がなくなる",
+      "弱くなる","無防備になる","距離が近くなる","よく話すようになる","よく笑うようになる",
+      "子供っぽくなる","照れやすくなる","スキンシップに弱くなる","ついからかってしまう",
+      "つい構ってしまう","何かと気にかける","特別扱いする","つい尽くしてしまう","頼られると嬉しくなる",
+      "自分から甘える","弱音を吐ける","本音を見せる","信頼すると一気に距離が縮まる",
+      "褒められると露骨に喜ぶ","好き避けしてしまう","つい意地を張る","愛情表現が下手になる",
+      "言葉より行動で愛情を示す","もらったものを大切にする","相手のことを細かく覚えている",
+      "相手の好みに敏感になる","相手の前だけ表情が柔らかくなる","相手にだけ弱さを見せる",
+      "相手のためなら無茶をする","一途になる","執着する","かなり重くなる","離れたがらなくなる",
+      "会いたがる","触れたがる","触れられると照れる","嫉妬を隠せなくなる","相手を優先するようになる",
+      "恋愛になると初心になる","好きと言われると話を逸らしてしまう"
+    ]
+  }
+};
+
+let gender="random";
+let currentGender="male";
+const S={}, L={};
+
+const COLORS = [
+  ["Black","#111111"],["Charcoal","#2B2F36"],["White","#FFFFFF"],["Silver","#C0C0C0"],
+  ["Light Gray","#D1D5DB"],["Beige","#D8C3A5"],["Cream","#FFF4D6"],["Mocha","#967969"],
+  ["Cocoa","#6F4E37"],["Brown","#7A5230"],["Camel","#C19A6B"],["Terracotta","#C65A3A"],
+  ["Rust","#B7410E"],["Coral","#FF7F66"],["Peach","#FFCBA4"],["Amber","#FFBF00"],
+  ["Gold","#D4AF37"],["Mustard","#D6A600"],["Olive","#708238"],["Sage Green","#9CAF88"],
+  ["Moss Green","#5F6F52"],["Forest Green","#228B22"],["Emerald","#50C878"],["Mint","#98FF98"],
+  ["Seafoam","#9FE2BF"],["Teal","#008080"],["Aqua","#00FFFF"],["Sky Blue","#87CEEB"],
+  ["Ice Blue","#D6F1FF"],["Denim Blue","#3F5F8F"],["Steel Blue","#4682B4"],["Cobalt Blue","#0047AB"],
+  ["Royal Blue","#4169E1"],["Sapphire Blue","#0F52BA"],["Deep Blue","#12355B"],["Midnight Blue","#191970"],
+  ["Indigo","#312E81"],["Violet","#8F00FF"],["Plum","#8E4585"],["Lavender","#B57EDC"],
+  ["Magenta","#FF00FF"],["Raspberry","#E30B5C"],["Rose Pink","#E8A0B8"],["Dusty Pink","#D8A7B1"],
+  ["Mauve","#E0B0FF"],["Burgundy","#800020"],["Wine Red","#722F37"],["Neon Pink","#FF1493"],
+  ["Neon Purple","#BC13FE"],["Neon Green","#39FF14"],["Neon Yellow","#DFFF00"],["Neon Orange","#FF5F1F"],
+  ["Neon Red","#FF3131"],["Neon Blue","#1F51FF"],["Lime","#BFFF00"],["Dusty Rose","#C08081"]
+];
+
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function chooseGender(){currentGender=gender==="random"?(Math.random()<.5?"male":"female"):gender}
+function pool(){return DATA.common}
+function hairString(v){return Array.isArray(v)?v.join(" × "):v}
+function make(k){
+  if(k==="髪型") return hairString(pick(DATA.common.髪型));
+  if(k==="種族"||k==="役職"||k==="目"||k==="服装スタイル"||k==="小物"||k==="性格"||k==="ギャップ") return pick(DATA.common[k]);
+  if(["MAIN","SUB1","SUB2","ACCENT"].includes(k)) return drawColor([]);
+  return "未確定";
+}
+function drawColor(used){
+  const usedHex=used.map(x=>Array.isArray(x)?x[1]:x);
+  const choices=COLORS.filter(c=>!usedHex.includes(c[1]));
+  return pick(choices.length?choices:COLORS);
+}
+function generate(full=true){
+  if(full) chooseGender();
+  if(full || !S.種族)S.種族=make("種族");
+  if(full || !S.役職)S.役職=make("役職");
+  if(full || !S.髪型)S.髪型=make("髪型");
+  if(full || !S.目)S.目=make("目");
+  if(full || !S.性格)S.性格=make("性格");
+  if(full || !S.ギャップ)S.ギャップ=make("ギャップ");
+  if(full || !S.服装スタイル)S.服装スタイル=make("服装スタイル");
+  if(full || !S.小物1)S.小物1=make("小物");
+  if(full || !S.小物2)S.小物2=make("小物");
+  if(S.小物2===S.小物1)S.小物2=make("小物");
+  ["MAIN","SUB1","SUB2","ACCENT"].forEach(k=>{if(full||!S[k])S[k]=drawColor(["MAIN","SUB1","SUB2","ACCENT"].filter(x=>x!==k).map(x=>S[x]).filter(Boolean))});
+  if(full||!S.髪色)S.髪色=drawColor([]);
+  if(full||!S.瞳色)S.瞳色=drawColor([S.髪色]);
+  render();
+}
+function actions(k){return `<div class="actions"><button class="reroll-one" data-reroll="${k}" title="再抽選">🔄</button></div>`}
+function row(k,label,val){return `<div class="row"><div><div class="name">${label}</div><div class="value">${val}</div></div>${actions(k)}</div>`}
+function colorValue(k){
+  const c=S[k];
+  return `<div class="prop-value color-fixed"><span class="color-box-name">${c[0]}</span><span class="color-box-swatch" style="background:${c[1]}" aria-hidden="true"></span></div>`;
+}
+function pair(a,b,la,lb){
+  const leftValue = a;
+  const rightValue = (lb === "髪色" ? colorValue("髪色") : lb === "瞳の色" ? colorValue("瞳色") : `<div class="prop-value">${b}</div>`);
+  return `<div class="prop-grid"><div class="prop-card"><div class="prop-label">${la}</div>${leftValue===undefined?"":`<div class="prop-value">${leftValue}</div>`}${actions(la)}</div><div class="prop-card"><div class="prop-label">${lb}</div>${rightValue}${actions(lb)}</div></div>`;
+}
+function render(){
+  const g=currentGender==="male"?"男性":"女性";
+  let h=`<div class="label">GENERATED CHARACTER</div><div class="attr">${g}</div>`;
+  h+=pair(S.種族,S.役職,"種族・存在","立場・役職");
+  h+=pair(S.性格,S.ギャップ,"性格","ギャップ");
+  h+=pair(S.髪型,S.髪色,"髪型","髪色");
+  h+=pair(S.目,S.瞳色,"目の形","瞳の色");
+  h+=row("服装スタイル","服装スタイル",S.服装スタイル);
+  h+=pair(S.小物1,S.小物2,"小物1","小物2");
+  h+=`<div class="color-title-row"><div class="color-title">カラー</div><button class="palette-reroll" id="rerollPalette">🔄</button></div>`;
+  h+=`<div class="color-grid">`;
+  [["MAIN","MAIN"],["SUB1","SUB 1"],["SUB2","SUB 2"],["ACCENT","ACCENT"]].forEach(([k,l])=>{
+    h+=`<div class="color-card"><div class="color-role">${l}</div><div class="color-chip" style="background:${S[k][1]}"></div><div class="color-name">${S[k][0]}</div><div class="color-code">${S[k][1]}</div></div>`;
+  });
+  h+=`</div>`;
+  h+=`<button class="copy" id="copyResult">結果をコピー</button><button class="copy" id="copyPrompt">AI用プロンプトをコピー</button>`;
+  document.getElementById("result").innerHTML=h;
+
+  document.querySelectorAll("[data-reroll]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.reroll;
+    if(k==="種族・存在")S.種族=make("種族");
+    else if(k==="立場・役職")S.役職=make("役職");
+    else if(k==="髪型")S.髪型=make("髪型");
+    else if(k==="髪色")S.髪色=drawColor([S.瞳色]);
+    else if(k==="瞳色"||k==="瞳の色")S.瞳色=drawColor([S.髪色]);
+    else if(k==="目の形")S.目=make("目");
+    else if(k==="性格")S.性格=make("性格");
+    else if(k==="ギャップ")S.ギャップ=make("ギャップ");
+    else if(k==="服装スタイル")S.服装スタイル=make("服装スタイル");
+    else if(k==="小物1"){S.小物1=make("小物");if(S.小物1===S.小物2)S.小物1=make("小物")}
+    else if(k==="小物2"){S.小物2=make("小物");if(S.小物2===S.小物1)S.小物2=make("小物")}
+    render();
+  });
+
+  document.getElementById("rerollPalette").onclick=()=>{
+    const keys=["MAIN","SUB1","SUB2","ACCENT"];
+    keys.forEach((k,i)=>S[k]=drawColor(keys.slice(0,i).map(x=>S[x])));
+    render();
+  };
+  document.getElementById("copyResult").onclick=()=>navigator.clipboard?.writeText(japaneseResult());
+  document.getElementById("copyPrompt").onclick=()=>navigator.clipboard?.writeText(englishPrompt());
+}
+function japaneseResult(){
+  const g=currentGender==="male"?"男性":"女性";
+  return `【CHARA BLENDER】\n性別：${g}\n種族・存在：${S.種族}\n立場・役職：${S.役職}\n髪型：${S.髪型}\n髪色：${S.髪色[0]}\n目の形：${S.目}\n瞳色：${S.瞳色[0]}\n服装スタイル：${S.服装スタイル}\n小物1：${S.小物1}\n小物2：${S.小物2}\n性格：${S.性格}\nギャップ：${S.ギャップ}`;
+}
+const EN={
+  "人間":"human","エルフ":"elf","ダークエルフ":"dark elf","ハーフエルフ":"half-elf","ドワーフ":"dwarf","猫獣人":"cat beastfolk","犬獣人":"dog beastfolk","狐獣人":"fox beastfolk","狼獣人":"wolf beastfolk","兎獣人":"rabbit beastfolk","虎獣人":"tiger beastfolk","熊獣人":"bear beastfolk","蛇獣人":"snake beastfolk","鳥人":"birdfolk","竜人":"dragonfolk","ドラゴン":"dragon","人魚":"merfolk","セイレーン":"siren","妖精":"fairy","精霊":"spirit","妖怪":"yokai","鬼":"oni","天使":"angel","堕天使":"fallen angel","悪魔":"demon","吸血鬼":"vampire","死神":"grim reaper","神":"deity","人造人間":"artificial human","ホムンクルス":"homunculus","人形":"doll","ゴーレム":"golem","サイボーグ":"cyborg","アンドロイド":"android","ゾンビ":"zombie","幽霊":"ghost",
+  "国王・女王":"king or queen","皇帝":"emperor","皇族":"royal family member","王子・王女":"prince or princess","贵族":"noble","貴族":"noble","名家の子息・令嬢":"child of a prestigious family","当主":"family head","御曹司":"heir to a wealthy family","マフィアのボス":"mafia boss","マフィア幹部":"mafia executive","組長":"yakuza boss","若頭":"yakuza heir","組織の幹部":"organization executive","頭領":"chief","情報屋":"information broker","暗殺者":"assassin","用心棒":"bodyguard","密売人":"smuggler","騎士団長":"knight commander","騎士":"knight","護衛":"guard","傭兵":"mercenary","狩人":"hunter","忍者":"ninja","エージェント":"agent","魔術師":"mage","大魔導士":"archmage","錬金術師":"alchemist","神官":"priest","聖職者":"clergy member","冒険者":"adventurer","社長":"company president","医者":"doctor","看護師":"nurse","警察官":"police officer","刑事":"detective","弁護士":"lawyer","教師":"teacher","学生":"student","探偵":"private detective","俳優・女優":"actor or actress","アイドル":"idol","モデル":"model","歌手":"singer","ダンサー":"dancer","作家":"writer","漫画家":"manga artist","イラストレーター":"illustrator","音楽家・作曲家":"musician and composer","芸術家":"artist","カメラマン":"photographer","映画監督":"film director","デザイナー":"designer","メイド":"maid","執事":"butler",
+  "ベリーショート":"very short hair","ショート":"short hair","ショートボブ":"short bob","ボブ":"bob hair","ミディアム":"medium-length hair","セミロング":"medium-long hair","ロング":"long hair","スーパーロング":"extra-long hair","前髪なし":"no bangs","斜め分け":"side-parted bangs","長めの前髪":"long bangs","センターパート":"center-parted bangs","目にかかる前髪":"eye-covering bangs","無造作な前髪":"messy bangs","片目を隠す前髪":"one-eye-covering bangs","ぱっつん前髪":"blunt bangs","シースルーバング":"see-through bangs","ストレート":"straight hair","ナチュラルレイヤー":"natural layers","無造作ヘア":"messy hair","レイヤー":"layered hair","ウルフ":"wolf cut","切りっぱなし":"blunt-cut ends","外ハネ":"outward flips","内巻き":"inward curls","ゆるいウェーブ":"loose waves","シャギー":"shaggy layers","強めのウェーブ":"defined waves","くせ毛":"naturally wavy hair",
+  "切れ長":"sharp narrow eyes","垂れ目":"downturned eyes","涼しげな目":"cool and refreshing eyes","鋭い目":"sharp eyes","伏し目がち":"downcast eyes","眠たげな目":"sleepy eyes","細めの目":"narrow eyes","柔らかな目":"soft eyes","三白眼":"sanpaku eyes","大きく印象的な目":"large and striking eyes",
+  "モード系":"modern fashion style","クラシック":"classic style","ストリート":"streetwear style","テックウェア":"techwear style","カジュアル":"casual style","フォーマル":"formal style","スーツスタイル":"suit style","プレッピー":"preppy style","ヴィンテージ":"vintage style","ロック":"rock style","パンク":"punk style","ゴシック":"gothic style","ゴシックロリータ":"gothic lolita style","ミニマル":"minimalist style","スポーティ":"sporty style","ミリタリー":"military style","軍服":"military uniform","和装":"traditional Japanese clothing","和モダン":"modern Japanese style","チャイナスタイル":"Chinese-inspired style","王侯貴族風":"royal aristocratic style","ファンタジー衣装":"fantasy attire","ダークファンタジー":"dark fantasy style","スチームパンク":"steampunk style","サイバーパンク":"cyberpunk style",
+  "なし":"none","メガネ":"glasses","モノクル":"monocle","イヤーカフ":"ear cuff","ピアス":"earrings","チョーカー":"choker","ネックレス":"necklace","ペンダント":"pendant","指輪":"ring","ブレスレット":"bracelet","腕時計":"wristwatch","懐中時計":"pocket watch","ネクタイピン":"tie clip","カフスボタン":"cufflinks","ヘアピン":"hairpin","ヘアクリップ":"hair clip","リボン":"ribbon","スカーフ":"scarf","ストール":"stole","マスク":"mask","手袋":"gloves","本":"book","万年筆":"fountain pen","手紙":"letter","花束":"bouquet","傘":"umbrella","扇子":"folding fan","杖":"staff","スマートフォン":"smartphone","カメラ":"camera","ヘッドホン":"headphones","マイク":"microphone","コーヒーカップ":"coffee cup","ワイングラス":"wine glass","トランプ":"playing cards","タロットカード":"tarot cards","魔導書":"spellbook","魔法石":"magic stone","水晶":"crystal","小瓶":"small vial","羽根ペン":"quill pen","お守り":"protective charm","聖印":"holy symbol","数珠":"prayer beads","ロザリオ":"rosary","チャーム":"charm","巾着袋":"drawstring pouch","宝石":"gemstone","古いコイン":"old coin","鍵":"key","キーホルダー":"keychain","レコード":"vinyl record","カセットテープ":"cassette tape","チェスの駒":"chess piece","古い写真":"old photograph","ぬいぐるみ":"plush toy","ピンバッジ":"pin badge","フィルムカメラ":"film camera","手帳":"planner","ペンダントウォッチ":"pendant watch","オルゴール":"music box",
+  "冷静沈着で落ち着いている":"calm and composed","クールで無口":"cool and quiet","飄々としていて掴みどころがない":"aloof and hard to read","高飛車で自信に満ちている":"arrogant and self-confident","強気で勝ち気":"strong-willed and competitive","毒舌で皮肉屋":"sharp-tongued and sarcastic","無愛想で他人と距離を置く":"unsociable and distant","ミステリアスで本心を見せない":"mysterious and guarded","真面目で几帳面":"serious and meticulous","頭脳明晰で合理的":"brilliant and rational","温厚で穏やか":"gentle and even-tempered","包容力があり大らか":"broad-minded and generous","面倒見がよく世話焼き":"caring and attentive","優しく気遣い上手":"kind and considerate","人懐っこく誰とでも打ち解ける":"friendly and easygoing","明るく陽気で楽観的":"cheerful and optimistic","無邪気で好奇心旺盛":"innocent and curious","おっとりしていてマイペース":"gentle and easygoing","天然で少し抜けている":"airheaded and a little absent-minded","愛嬌があり親しみやすい":"charming and approachable","豪快で細かいことを気にしない":"bold and unconcerned with details","自由奔放で行動力がある":"free-spirited and proactive","野心的で上昇志向が強い":"ambitious and strongly driven to rise","完璧主義で妥協を許さない":"a perfectionist who refuses to compromise","慎重で用心深い":"careful and cautious","頑固で自分の信念を曲げない":"stubborn and unwavering in their beliefs","情熱的で感情表現が豊か":"passionate and emotionally expressive","素直で裏表がない":"honest and straightforward","人見知りで他人と打ち解けるのが苦手":"shy and slow to open up","洞察力が鋭く、人の本質を見抜く":"perceptive and able to see through people","常に余裕ぶっている":"always acts effortlessly confident","人の反応を見るのが好き":"enjoys watching people's reactions","他人を試すような言動が多い":"often tests other people","自分の美学を何より優先する":"puts their personal aesthetic above everything","気に入ったものには異常に執着する":"becomes intensely attached to things they like","人の懐に入るのが異様に上手い":"exceptionally good at getting close to people","相手を翻弄することを楽しむ":"enjoys teasing and toying with people","危険な状況ほど楽しそうにする":"looks happiest in dangerous situations","他人の常識に興味がない":"has little interest in other people's conventions","享楽的で刹那的":"hedonistic and living in the moment",
+  "とことん甘い":"becomes extremely sweet","不器用になる":"becomes awkward","素直になる":"becomes honest","素直になれない":"cannot be honest about their feelings","甘えん坊になる":"becomes clingy","過保護になる":"becomes overprotective","世話を焼きたがる":"becomes eager to take care of them","独占欲が強くなる":"becomes possessive","嫉妬深くなる":"becomes jealous","途端に余裕がなくなる":"suddenly loses their composure","弱くなる":"becomes vulnerable","無防備になる":"becomes defenseless","距離が近くなる":"stands much closer","よく話すようになる":"talks much more","よく笑うようになる":"laughs much more","子供っぽくなる":"becomes childish","照れやすくなる":"gets embarrassed easily","スキンシップに弱くなる":"becomes sensitive to physical affection","ついからかってしまう":"cannot help teasing them","つい構ってしまう":"cannot help seeking their attention","何かと気にかける":"keeps checking on them","特別扱いする":"treats them specially","つい尽くしてしまう":"cannot help doing things for them","頼られると嬉しくなる":"is happy when they rely on them","自分から甘える":"initiates affection","弱音を吐ける":"can show their vulnerable side","本音を見せる":"shows their true feelings","信頼すると一気に距離が縮まる":"closes the distance quickly once they trust them","褒められると露骨に喜ぶ":"openly lights up when praised","好き避けしてしまう":"avoids them because they like them","つい意地を張る":"cannot help being stubborn","愛情表現が下手になる":"becomes bad at expressing affection","言葉より行動で愛情を示す":"shows affection through actions rather than words","もらったものを大切にする":"treasures gifts from them","相手のことを細かく覚えている":"remembers little details about them","相手の好みに敏感になる":"becomes highly attentive to their preferences","相手の前だけ表情が柔らかくなる":"softens only around them","相手にだけ弱さを見せる":"shows weakness only to them","相手のためなら無茶をする":"takes reckless risks for them","一途になる":"becomes devoted","執着する":"becomes deeply attached","かなり重くなる":"becomes intensely devoted","離れたがらなくなる":"does not want to be apart","会いたがる":"wants to see them often","触れたがる":"wants to touch them","触れられると照れる":"gets shy when touched","嫉妬を隠せなくなる":"cannot hide their jealousy","相手を優先するようになる":"starts putting them first","恋愛になると初心になる":"becomes inexperienced and innocent in love","好きと言われると話を逸らしてしまう":"changes the subject when told they are loved"
+};
+function englishText(t){let s=String(t);Object.keys(EN).sort((a,b)=>b.length-a.length).forEach(k=>s=s.split(k).join(EN[k]));return s}
+function englishHair(t){return String(t).split(" × ").map(x=>englishText(x)).join(", ")}
+function englishPrompt(){
+  const subject=currentGender==="male"?"handsome young man":"beautiful young woman";
+  const accessories=[S.小物1,S.小物2].filter(x=>x!=="なし").map(englishText).join(", ");
+  return `${subject}, ${englishText(S.種族)}, ${englishText(S.役職)}, ${englishHair(S.髪型)}, ${S.髪色[0].toLowerCase()} hair, ${englishText(S.目)}, ${S.瞳色[0].toLowerCase()} eyes, ${englishText(S.服装スタイル)}, ${accessories?accessories+", ":""}${englishText(S.性格)}, ${englishText(S.ギャップ)}`;
+}
+document.querySelectorAll("[data-gender]").forEach(b=>b.onclick=()=>{gender=b.dataset.gender;document.querySelectorAll("[data-gender]").forEach(x=>x.classList.toggle("selected",x===b));generate(true)});
+document.getElementById("draw").onclick=()=>generate(true);
+document.querySelector('[data-gender="random"]').classList.add("selected");
+generate(true);
+</script>
+</script></main></body></html>
