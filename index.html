@@ -239,6 +239,35 @@ main{max-width:700px;margin:auto;padding:34px 14px 56px}
 .prop-card{min-width:0 !important;padding-right:40px !important;}
 @media(max-width:520px){.prop-card{padding-right:38px !important;}.prop-card .prop-value:not(.prop-color-value){font-size:12.5px !important;line-height:1.4 !important;}}
 </style>
+<style id="compact-mobile-layout">
+@media(max-width:520px){
+  main{padding:16px 10px 30px!important}
+  .hero-title{font-size:25px!important;margin:0 0 3px!important}
+  .hero-sub{font-size:9px!important;margin:0 0 9px!important}
+  .gender-box{padding:7px 8px 6px!important;margin:0 0 8px!important}
+  .gender-label{font-size:9px!important;margin:0 0 5px!important}
+  .gender-buttons{gap:5px!important}
+  .gender-btn{height:34px!important;font-size:11px!important}
+  .draw{height:43px!important;font-size:14px!important;border-radius:12px!important}
+  .card{margin-top:9px!important;padding:9px 10px!important;border-radius:13px!important}
+  .label{font-size:8px!important}
+  .attr{font-size:17px!important;line-height:1.05!important}
+  .prop-card{padding-top:4px!important;padding-bottom:4px!important;min-height:37px!important}
+  .prop-label{font-size:8px!important;margin-bottom:1px!important}
+  .prop-value{font-size:11px!important;line-height:1.2!important;min-height:17px!important}
+  .prop-card .actions{right:4px!important}
+  .prop-card .actions button{width:25px!important;height:25px!important;font-size:10px!important}
+  .color-title-row{margin:7px 0 3px!important}
+  .color-title{font-size:9px!important}
+  .palette-reroll{width:25px!important;height:25px!important;font-size:10px!important}
+  .color-grid{gap:4px!important}
+  .color-chip{height:27px!important;border-radius:6px!important}
+  .color-role{font-size:7px!important}
+  .color-name{font-size:8px!important;min-height:14px!important}
+  .color-code{font-size:7px!important;margin:1px 0 2px!important}
+  .copy{margin-top:5px!important;padding:7px!important;font-size:10px!important;border-radius:9px!important}
+}
+</style>
 </head><body><main><div class="hero-title">CHARA BLENDER</div><div class="hero-sub">― 運命に任せて、ひとりのキャラクターを召喚。 ―</div><div class="gender-box"><div class="gender-label">性別を選ぶ</div><div class="gender-buttons"><button class="gender-btn" data-gender="male">男性</button><button class="gender-btn" data-gender="female">女性</button><button class="gender-btn" data-gender="random">ランダム</button></div></div><button class="draw" id="draw">⭐ 召喚する ⭐</button>
 <section class="card" id="result"></section></main>
 
@@ -252,7 +281,7 @@ const DATA = {
       "猫獣人","犬獣人","狐獣人","狼獣人","兎獣人","虎獣人","熊獣人","蛇獣人","鳥人",
       "竜人","ドラゴン","人魚","セイレーン","妖精","精霊","妖怪","鬼",
       "天使","堕天使","悪魔","吸血鬼","死神","神",
-      "人造人間","ホムンクルス","人形","ゴーレム","サイボーグ","アンドロイド","ゾンビ","幽霊"
+      "人造人間","ホムンクルス","ゴーレム","サイボーグ","アンドロイド","ゾンビ","幽霊"
     ],
     役職: [
       "国王・女王","皇帝","皇族","王子・王女","貴族","名家の子息・令嬢","当主","御曹司",
@@ -355,6 +384,15 @@ const DATA = {
       "カセットテープ","チェスの駒","古い写真","ぬいぐるみ","ピンバッジ",
       "フィルムカメラ","手帳","ペンダントウォッチ","オルゴール"
     ],
+    背景: [
+      "雨の降る夜の路地裏","ネオンが輝く未来都市","高層ビルの屋上","静かな夜の街角",
+      "古城の大広間","月明かりの庭園","荘厳な神殿","幻想的な森",
+      "桜が舞う神社","霧に包まれた湖畔","静かな図書館","クラシックなカフェ",
+      "華やかな舞踏会場","豪華な宮殿のテラス","薄暗い地下施設","秘密のアジト",
+      "近未来的な研究施設","サイバーな繁華街","ライブステージ","撮影スタジオ",
+      "駅のホーム","古い洋館の廊下","海辺の夕暮れ","雪の降る街",
+      "花が咲き乱れる庭園","荒野の遺跡","幻想的な星空の下","夜明けの街"
+    ],
     性格: [
       "冷静沈着で落ち着いている","クールで無口","飄々としていて掴みどころがない",
       "高飛車で自信に満ちている","強気で勝ち気","毒舌で皮肉屋","無愛想で他人と距離を置く",
@@ -412,9 +450,57 @@ function pick(a){return a[Math.floor(Math.random()*a.length)]}
 function chooseGender(){currentGender=gender==="random"?(Math.random()<.5?"male":"female"):gender}
 function pool(){return DATA.common}
 function hairString(v){return Array.isArray(v)?v.join(" × "):v}
+const ITEM_LINKS = {
+  "歌手":["マイク","ヘッドホン","マイク"],"アイドル":["マイク","ヘッドホン","ピンバッジ"],"ダンサー":["ヘッドホン","マイク","スマートフォン"],
+  "カメラマン":["カメラ","フィルムカメラ","手帳"],"映画監督":["カメラ","フィルムカメラ","手帳"],"俳優・女優":["手帳","花束","カメラ"],
+  "音楽家・作曲家":["ヘッドホン","万年筆","カセットテープ"],"芸術家":["万年筆","手帳","カメラ"],"イラストレーター":["万年筆","手帳","カメラ"],"漫画家":["万年筆","手帳","カメラ"],
+  "医者":["手帳","腕時計","メガネ"],"看護師":["腕時計","手帳","ピンバッジ"],"警察官":["手帳","腕時計","鍵"],"刑事":["手帳","カメラ","古い写真"],"探偵":["手帳","万年筆","古い写真"],
+  "弁護士":["万年筆","手帳","腕時計"],"教師":["万年筆","本","手帳"],"学生":["本","ヘッドホン","スマートフォン"],
+  "魔術師":["魔導書","魔法石","水晶"],"大魔導士":["魔導書","魔法石","水晶"],"錬金術師":["小瓶","魔法石","水晶"],
+  "神官":["聖印","ロザリオ","数珠"],"聖職者":["ロザリオ","聖印","数珠"],"冒険者":["鍵","宝石","小瓶"],
+  "忍者":["鍵","お守り","手袋"],"暗殺者":["鍵","手袋","マスク"],"情報屋":["スマートフォン","手帳","カメラ"],
+  "王子・王女":["宝石","ペンダント","扇子"],"国王・女王":["宝石","ペンダントウォッチ","扇子"],"皇帝":["宝石","懐中時計","ペンダント"],
+  "貴族":["懐中時計","宝石","手袋"],"名家の子息・令嬢":["ペンダント","指輪","手袋"],"当主":["懐中時計","指輪","鍵"],"御曹司":["腕時計","スマートフォン","指輪"],
+  "メイド":["リボン","花束","鍵"],"執事":["懐中時計","手袋","鍵"]
+};
+const STYLE_LINKS = {
+  "ゴシック":["ロザリオ","チョーカー","懐中時計","指輪"],"ゴシックロリータ":["リボン","傘","ペンダント","花束"],
+  "パンク":["ピンバッジ","指輪","カセットテープ","ネックレス"],"ロック":["ヘッドホン","ピンバッジ","カセットテープ","ネックレス"],
+  "和装":["扇子","お守り","数珠","花束"],"和モダン":["扇子","腕時計","ペンダント","お守り"],"チャイナスタイル":["扇子","チャーム","宝石","花束"],
+  "ファンタジー衣装":["魔法石","魔導書","宝石","水晶"],"ダークファンタジー":["魔法石","ロザリオ","古いコイン","鍵"],
+  "スチームパンク":["懐中時計","ペンダントウォッチ","古いコイン","鍵"],"サイバーパンク":["スマートフォン","ヘッドホン","カセットテープ","ピンバッジ"],
+  "テックウェア":["スマートフォン","ヘッドホン","腕時計","ピンバッジ"],"ミリタリー":["腕時計","手袋","ピンバッジ","手帳"],"軍服":["腕時計","手袋","ピンバッジ","懐中時計"]
+};
+const SPECIES_LINKS = {
+  "吸血鬼":["ワイングラス","ロザリオ","宝石","古いコイン"],"天使":["聖印","羽根ペン","花束"],"堕天使":["ロザリオ","古いコイン","鍵"],"悪魔":["タロットカード","古いコイン","鍵"],
+  "神":["聖印","数珠","水晶","宝石"],"死神":["鍵","古いコイン","懐中時計"],"妖精":["花束","チャーム","小瓶"],"精霊":["水晶","花束","魔法石"],
+  "人魚":["宝石","花束","ペンダント"],"セイレーン":["マイク","ペンダント","花束"]
+};
+function weightedItem(){
+  const pool=[...DATA.common.小物];
+  const linked=[...(ITEM_LINKS[S.役職]||[]),...(STYLE_LINKS[S.服装スタイル]||[]),...(SPECIES_LINKS[S.種族]||[])];
+  const weighted=pool.flatMap(x=>{const n=linked.includes(x)?4:1; return Array(n).fill(x)});
+  return pick(weighted);
+}
+const BG_LINKS = {
+  "歌手":["ライブステージ","撮影スタジオ","ネオンが輝く未来都市"],"アイドル":["ライブステージ","ネオンが輝く未来都市","高層ビルの屋上"],"モデル":["撮影スタジオ","高層ビルの屋上","華やかな舞踏会場"],
+  "刑事":["雨の降る夜の路地裏","静かな夜の街角","薄暗い地下施設"],"警察官":["雨の降る夜の路地裏","駅のホーム","静かな夜の街角"],"探偵":["古い洋館の廊下","静かな図書館","雨の降る夜の路地裏"],
+  "魔術師":["幻想的な森","荘厳な神殿","古城の大広間"],"大魔導士":["荘厳な神殿","幻想的な星空の下","古城の大広間"],"神官":["荘厳な神殿","月明かりの庭園","桜が舞う神社"],
+  "王子・王女":["豪華な宮殿のテラス","華やかな舞踏会場","月明かりの庭園"],"国王・女王":["豪華な宮殿のテラス","古城の大広間","華やかな舞踏会場"],
+  "吸血鬼":["古城の大広間","月明かりの庭園","薄暗い地下施設"],"神":["荘厳な神殿","幻想的な星空の下","雲上の神殿"],
+  "サイバーパンク":["ネオンが輝く未来都市","サイバーな繁華街","近未来的な研究施設"],"スチームパンク":["古い洋館の廊下","駅のホーム","薄暗い地下施設"],
+  "和装":["桜が舞う神社","月明かりの庭園","霧に包まれた湖畔"],"ゴシック":["古城の大広間","月明かりの庭園","薄暗い地下施設"]
+};
+function weightedBackground(){
+  const pool=DATA.common.背景;
+  const linked=[...(BG_LINKS[S.役職]||[]),...(BG_LINKS[S.服装スタイル]||[]),...(BG_LINKS[S.種族]||[])];
+  return pick(pool.flatMap(x=>Array((linked.includes(x)?4:1)).fill(x)));
+}
 function make(k){
   if(k==="髪型") return hairString(pick(DATA.common.髪型));
-  if(k==="種族"||k==="役職"||k==="目"||k==="服装スタイル"||k==="小物"||k==="性格"||k==="ギャップ") return pick(DATA.common[k]);
+  if(k==="小物") return weightedItem();
+  if(k==="背景") return weightedBackground();
+  if(k==="種族"||k==="役職"||k==="目"||k==="服装スタイル"||k==="性格"||k==="ギャップ") return pick(DATA.common[k]);
   if(["MAIN","SUB1","SUB2","ACCENT"].includes(k)) return drawColor([]);
   return "未確定";
 }
@@ -433,8 +519,7 @@ function generate(full=true){
   if(full || !S.ギャップ)S.ギャップ=make("ギャップ");
   if(full || !S.服装スタイル)S.服装スタイル=make("服装スタイル");
   if(full || !S.小物1)S.小物1=make("小物");
-  if(full || !S.小物2)S.小物2=make("小物");
-  if(S.小物2===S.小物1)S.小物2=make("小物");
+  if(full || !S.背景)S.背景=make("背景");
   ["MAIN","SUB1","SUB2","ACCENT"].forEach(k=>{if(full||!S[k])S[k]=drawColor(["MAIN","SUB1","SUB2","ACCENT"].filter(x=>x!==k).map(x=>S[x]).filter(Boolean))});
   if(full||!S.髪色)S.髪色=drawColor([]);
   if(full||!S.瞳色)S.瞳色=drawColor([S.髪色]);
@@ -459,7 +544,7 @@ function render(){
   h+=pair(S.髪型,S.髪色,"髪型","髪色");
   h+=pair(S.目,S.瞳色,"目の形","瞳の色");
   h+=row("服装スタイル","服装スタイル",S.服装スタイル);
-  h+=pair(S.小物1,S.小物2,"小物1","小物2");
+  h+=pair(S.小物1,S.背景,"小物","背景");
   h+=`<div class="color-title-row"><div class="color-title">カラー</div><button class="palette-reroll" id="rerollPalette">🔄</button></div>`;
   h+=`<div class="color-grid">`;
   [["MAIN","MAIN"],["SUB1","SUB 1"],["SUB2","SUB 2"],["ACCENT","ACCENT"]].forEach(([k,l])=>{
@@ -480,8 +565,8 @@ function render(){
     else if(k==="性格")S.性格=make("性格");
     else if(k==="ギャップ")S.ギャップ=make("ギャップ");
     else if(k==="服装スタイル")S.服装スタイル=make("服装スタイル");
-    else if(k==="小物1"){S.小物1=make("小物");if(S.小物1===S.小物2)S.小物1=make("小物")}
-    else if(k==="小物2"){S.小物2=make("小物");if(S.小物2===S.小物1)S.小物2=make("小物")}
+    else if(k==="小物"){S.小物1=make("小物")}
+    else if(k==="背景"){S.背景=make("背景")}
     render();
   });
 
@@ -495,24 +580,37 @@ function render(){
 }
 function japaneseResult(){
   const g=currentGender==="male"?"男性":"女性";
-  return `【CHARA BLENDER】\n性別：${g}\n種族・存在：${S.種族}\n立場・役職：${S.役職}\n髪型：${S.髪型}\n髪色：${S.髪色[0]}\n目の形：${S.目}\n瞳色：${S.瞳色[0]}\n服装スタイル：${S.服装スタイル}\n小物1：${S.小物1}\n小物2：${S.小物2}\n性格：${S.性格}\nギャップ：${S.ギャップ}`;
+  return `【CHARA BLENDER】\n性別：${g}\n種族・存在：${S.種族}\n立場・役職：${S.役職}\n髪型：${S.髪型}\n髪色：${S.髪色[0]}\n目の形：${S.目}\n瞳色：${S.瞳色[0]}\n服装スタイル：${S.服装スタイル}\n小物：${S.小物1}\n背景：${S.背景}\n性格：${S.性格}\nギャップ：${S.ギャップ}\nカラー MAIN：${S.MAIN[0]}\nカラー SUB 1：${S.SUB1[0]}\nカラー SUB 2：${S.SUB2[0]}\nカラー ACCENT：${S.ACCENT[0]}`;
 }
 const EN={
-  "人間":"human","エルフ":"elf","ダークエルフ":"dark elf","ハーフエルフ":"half-elf","ドワーフ":"dwarf","猫獣人":"cat beastfolk","犬獣人":"dog beastfolk","狐獣人":"fox beastfolk","狼獣人":"wolf beastfolk","兎獣人":"rabbit beastfolk","虎獣人":"tiger beastfolk","熊獣人":"bear beastfolk","蛇獣人":"snake beastfolk","鳥人":"birdfolk","竜人":"dragonfolk","ドラゴン":"dragon","人魚":"merfolk","セイレーン":"siren","妖精":"fairy","精霊":"spirit","妖怪":"yokai","鬼":"oni","天使":"angel","堕天使":"fallen angel","悪魔":"demon","吸血鬼":"vampire","死神":"grim reaper","神":"deity","人造人間":"artificial human","ホムンクルス":"homunculus","人形":"doll","ゴーレム":"golem","サイボーグ":"cyborg","アンドロイド":"android","ゾンビ":"zombie","幽霊":"ghost",
+  "人間":"human","エルフ":"elf","ダークエルフ":"dark elf","ハーフエルフ":"half-elf","ドワーフ":"dwarf","猫獣人":"cat beastfolk","犬獣人":"dog beastfolk","狐獣人":"fox beastfolk","狼獣人":"wolf beastfolk","兎獣人":"rabbit beastfolk","虎獣人":"tiger beastfolk","熊獣人":"bear beastfolk","蛇獣人":"snake beastfolk","鳥人":"birdfolk","竜人":"dragonfolk","ドラゴン":"dragon","人魚":"merfolk","セイレーン":"siren","妖精":"fairy","精霊":"spirit","妖怪":"yokai","鬼":"oni","天使":"angel","堕天使":"fallen angel","悪魔":"demon","吸血鬼":"vampire","死神":"grim reaper","神":"deity","人造人間":"artificial human","ホムンクルス":"homunculus","ゴーレム":"golem","サイボーグ":"cyborg","アンドロイド":"android","ゾンビ":"zombie","幽霊":"ghost",
   "国王・女王":"king or queen","皇帝":"emperor","皇族":"royal family member","王子・王女":"prince or princess","贵族":"noble","貴族":"noble","名家の子息・令嬢":"child of a prestigious family","当主":"family head","御曹司":"heir to a wealthy family","マフィアのボス":"mafia boss","マフィア幹部":"mafia executive","組長":"yakuza boss","若頭":"yakuza heir","組織の幹部":"organization executive","頭領":"chief","情報屋":"information broker","暗殺者":"assassin","用心棒":"bodyguard","密売人":"smuggler","騎士団長":"knight commander","騎士":"knight","護衛":"guard","傭兵":"mercenary","狩人":"hunter","忍者":"ninja","エージェント":"agent","魔術師":"mage","大魔導士":"archmage","錬金術師":"alchemist","神官":"priest","聖職者":"clergy member","冒険者":"adventurer","社長":"company president","医者":"doctor","看護師":"nurse","警察官":"police officer","刑事":"detective","弁護士":"lawyer","教師":"teacher","学生":"student","探偵":"private detective","俳優・女優":"actor or actress","アイドル":"idol","モデル":"model","歌手":"singer","ダンサー":"dancer","作家":"writer","漫画家":"manga artist","イラストレーター":"illustrator","音楽家・作曲家":"musician and composer","芸術家":"artist","カメラマン":"photographer","映画監督":"film director","デザイナー":"designer","メイド":"maid","執事":"butler",
   "ベリーショート":"very short hair","ショート":"short hair","ショートボブ":"short bob","ボブ":"bob hair","ミディアム":"medium-length hair","セミロング":"medium-long hair","ロング":"long hair","スーパーロング":"extra-long hair","前髪なし":"no bangs","斜め分け":"side-parted bangs","長めの前髪":"long bangs","センターパート":"center-parted bangs","目にかかる前髪":"eye-covering bangs","無造作な前髪":"messy bangs","片目を隠す前髪":"one-eye-covering bangs","ぱっつん前髪":"blunt bangs","シースルーバング":"see-through bangs","ストレート":"straight hair","ナチュラルレイヤー":"natural layers","無造作ヘア":"messy hair","レイヤー":"layered hair","ウルフ":"wolf cut","切りっぱなし":"blunt-cut ends","外ハネ":"outward flips","内巻き":"inward curls","ゆるいウェーブ":"loose waves","シャギー":"shaggy layers","強めのウェーブ":"defined waves","くせ毛":"naturally wavy hair",
   "切れ長":"sharp narrow eyes","垂れ目":"downturned eyes","涼しげな目":"cool and refreshing eyes","鋭い目":"sharp eyes","伏し目がち":"downcast eyes","眠たげな目":"sleepy eyes","細めの目":"narrow eyes","柔らかな目":"soft eyes","三白眼":"sanpaku eyes","大きく印象的な目":"large and striking eyes",
   "モード系":"modern fashion style","クラシック":"classic style","ストリート":"streetwear style","テックウェア":"techwear style","カジュアル":"casual style","フォーマル":"formal style","スーツスタイル":"suit style","プレッピー":"preppy style","ヴィンテージ":"vintage style","ロック":"rock style","パンク":"punk style","ゴシック":"gothic style","ゴシックロリータ":"gothic lolita style","ミニマル":"minimalist style","スポーティ":"sporty style","ミリタリー":"military style","軍服":"military uniform","和装":"traditional Japanese clothing","和モダン":"modern Japanese style","チャイナスタイル":"Chinese-inspired style","王侯貴族風":"royal aristocratic style","ファンタジー衣装":"fantasy attire","ダークファンタジー":"dark fantasy style","スチームパンク":"steampunk style","サイバーパンク":"cyberpunk style",
   "なし":"none","メガネ":"glasses","モノクル":"monocle","イヤーカフ":"ear cuff","ピアス":"earrings","チョーカー":"choker","ネックレス":"necklace","ペンダント":"pendant","指輪":"ring","ブレスレット":"bracelet","腕時計":"wristwatch","懐中時計":"pocket watch","ネクタイピン":"tie clip","カフスボタン":"cufflinks","ヘアピン":"hairpin","ヘアクリップ":"hair clip","リボン":"ribbon","スカーフ":"scarf","ストール":"stole","マスク":"mask","手袋":"gloves","本":"book","万年筆":"fountain pen","手紙":"letter","花束":"bouquet","傘":"umbrella","扇子":"folding fan","杖":"staff","スマートフォン":"smartphone","カメラ":"camera","ヘッドホン":"headphones","マイク":"microphone","コーヒーカップ":"coffee cup","ワイングラス":"wine glass","トランプ":"playing cards","タロットカード":"tarot cards","魔導書":"spellbook","魔法石":"magic stone","水晶":"crystal","小瓶":"small vial","羽根ペン":"quill pen","お守り":"protective charm","聖印":"holy symbol","数珠":"prayer beads","ロザリオ":"rosary","チャーム":"charm","巾着袋":"drawstring pouch","宝石":"gemstone","古いコイン":"old coin","鍵":"key","キーホルダー":"keychain","レコード":"vinyl record","カセットテープ":"cassette tape","チェスの駒":"chess piece","古い写真":"old photograph","ぬいぐるみ":"plush toy","ピンバッジ":"pin badge","フィルムカメラ":"film camera","手帳":"planner","ペンダントウォッチ":"pendant watch","オルゴール":"music box",
   "冷静沈着で落ち着いている":"calm and composed","クールで無口":"cool and quiet","飄々としていて掴みどころがない":"aloof and hard to read","高飛車で自信に満ちている":"arrogant and self-confident","強気で勝ち気":"strong-willed and competitive","毒舌で皮肉屋":"sharp-tongued and sarcastic","無愛想で他人と距離を置く":"unsociable and distant","ミステリアスで本心を見せない":"mysterious and guarded","真面目で几帳面":"serious and meticulous","頭脳明晰で合理的":"brilliant and rational","温厚で穏やか":"gentle and even-tempered","包容力があり大らか":"broad-minded and generous","面倒見がよく世話焼き":"caring and attentive","優しく気遣い上手":"kind and considerate","人懐っこく誰とでも打ち解ける":"friendly and easygoing","明るく陽気で楽観的":"cheerful and optimistic","無邪気で好奇心旺盛":"innocent and curious","おっとりしていてマイペース":"gentle and easygoing","天然で少し抜けている":"airheaded and a little absent-minded","愛嬌があり親しみやすい":"charming and approachable","豪快で細かいことを気にしない":"bold and unconcerned with details","自由奔放で行動力がある":"free-spirited and proactive","野心的で上昇志向が強い":"ambitious and strongly driven to rise","完璧主義で妥協を許さない":"a perfectionist who refuses to compromise","慎重で用心深い":"careful and cautious","頑固で自分の信念を曲げない":"stubborn and unwavering in their beliefs","情熱的で感情表現が豊か":"passionate and emotionally expressive","素直で裏表がない":"honest and straightforward","人見知りで他人と打ち解けるのが苦手":"shy and slow to open up","洞察力が鋭く、人の本質を見抜く":"perceptive and able to see through people","常に余裕ぶっている":"always acts effortlessly confident","人の反応を見るのが好き":"enjoys watching people's reactions","他人を試すような言動が多い":"often tests other people","自分の美学を何より優先する":"puts their personal aesthetic above everything","気に入ったものには異常に執着する":"becomes intensely attached to things they like","人の懐に入るのが異様に上手い":"exceptionally good at getting close to people","相手を翻弄することを楽しむ":"enjoys teasing and toying with people","危険な状況ほど楽しそうにする":"looks happiest in dangerous situations","他人の常識に興味がない":"has little interest in other people's conventions","享楽的で刹那的":"hedonistic and living in the moment",
-  "とことん甘い":"becomes extremely sweet","不器用になる":"becomes awkward","素直になる":"becomes honest","素直になれない":"cannot be honest about their feelings","甘えん坊になる":"becomes clingy","過保護になる":"becomes overprotective","世話を焼きたがる":"becomes eager to take care of them","独占欲が強くなる":"becomes possessive","嫉妬深くなる":"becomes jealous","途端に余裕がなくなる":"suddenly loses their composure","弱くなる":"becomes vulnerable","無防備になる":"becomes defenseless","距離が近くなる":"stands much closer","よく話すようになる":"talks much more","よく笑うようになる":"laughs much more","子供っぽくなる":"becomes childish","照れやすくなる":"gets embarrassed easily","スキンシップに弱くなる":"becomes sensitive to physical affection","ついからかってしまう":"cannot help teasing them","つい構ってしまう":"cannot help seeking their attention","何かと気にかける":"keeps checking on them","特別扱いする":"treats them specially","つい尽くしてしまう":"cannot help doing things for them","頼られると嬉しくなる":"is happy when they rely on them","自分から甘える":"initiates affection","弱音を吐ける":"can show their vulnerable side","本音を見せる":"shows their true feelings","信頼すると一気に距離が縮まる":"closes the distance quickly once they trust them","褒められると露骨に喜ぶ":"openly lights up when praised","好き避けしてしまう":"avoids them because they like them","つい意地を張る":"cannot help being stubborn","愛情表現が下手になる":"becomes bad at expressing affection","言葉より行動で愛情を示す":"shows affection through actions rather than words","もらったものを大切にする":"treasures gifts from them","相手のことを細かく覚えている":"remembers little details about them","相手の好みに敏感になる":"becomes highly attentive to their preferences","相手の前だけ表情が柔らかくなる":"softens only around them","相手にだけ弱さを見せる":"shows weakness only to them","相手のためなら無茶をする":"takes reckless risks for them","一途になる":"becomes devoted","執着する":"becomes deeply attached","かなり重くなる":"becomes intensely devoted","離れたがらなくなる":"does not want to be apart","会いたがる":"wants to see them often","触れたがる":"wants to touch them","触れられると照れる":"gets shy when touched","嫉妬を隠せなくなる":"cannot hide their jealousy","相手を優先するようになる":"starts putting them first","恋愛になると初心になる":"becomes inexperienced and innocent in love","好きと言われると話を逸らしてしまう":"changes the subject when told they are loved"
+  "とことん甘い":"becomes extremely sweet","不器用になる":"becomes awkward","素直になる":"becomes honest","素直になれない":"cannot be honest about their feelings","甘えん坊になる":"becomes clingy","過保護になる":"becomes overprotective","世話を焼きたがる":"becomes eager to take care of them","独占欲が強くなる":"becomes possessive","嫉妬深くなる":"becomes jealous","途端に余裕がなくなる":"suddenly loses their composure","弱くなる":"becomes vulnerable","無防備になる":"becomes defenseless","距離が近くなる":"stands much closer","よく話すようになる":"talks much more","よく笑うようになる":"laughs much more","子供っぽくなる":"becomes childish","照れやすくなる":"gets embarrassed easily","スキンシップに弱くなる":"becomes sensitive to physical affection","ついからかってしまう":"cannot help teasing them","つい構ってしまう":"cannot help seeking their attention","何かと気にかける":"keeps checking on them","特別扱いする":"treats them specially","つい尽くしてしまう":"cannot help doing things for them","頼られると嬉しくなる":"is happy when they rely on them","自分から甘える":"initiates affection","弱音を吐ける":"can show their vulnerable side","本音を見せる":"shows their true feelings","信頼すると一気に距離が縮まる":"closes the distance quickly once they trust them","褒められると露骨に喜ぶ":"openly lights up when praised","好き避けしてしまう":"avoids them because they like them","つい意地を張る":"cannot help being stubborn","愛情表現が下手になる":"becomes bad at expressing affection","言葉より行動で愛情を示す":"shows affection through actions rather than words","もらったものを大切にする":"treasures gifts from them","相手のことを細かく覚えている":"remembers little details about them","相手の好みに敏感になる":"becomes highly attentive to their preferences","相手の前だけ表情が柔らかくなる":"softens only around them","相手にだけ弱さを見せる":"shows weakness only to them","相手のためなら無茶をする":"takes reckless risks for them","一途になる":"becomes devoted","執着する":"becomes deeply attached","かなり重くなる":"becomes intensely devoted","離れたがらなくなる":"does not want to be apart","会いたがる":"wants to see them often","触れたがる":"wants to touch them","触れられると照れる":"gets shy when touched","嫉妬を隠せなくなる":"cannot hide their jealousy","相手を優先するようになる":"starts putting them first","恋愛になると初心になる":"becomes inexperienced and innocent in love","好きと言われると話を逸らしてしまう":"changes the subject when told they are loved",
+  "雨の降る夜の路地裏":"rainy back alley at night","ネオンが輝く未来都市":"futuristic neon city","高層ビルの屋上":"rooftop of a skyscraper","静かな夜の街角":"quiet city corner at night","古城の大広間":"grand hall of an ancient castle","月明かりの庭園":"moonlit garden","荘厳な神殿":"majestic temple","幻想的な森":"fantasy forest","桜が舞う神社":"shrine with falling cherry blossoms","霧に包まれた湖畔":"misty lakeside","静かな図書館":"quiet library","クラシックなカフェ":"classic cafe","華やかな舞踏会場":"elegant ballroom","豪華な宮殿のテラス":"luxurious palace terrace","薄暗い地下施設":"dim underground facility","秘密のアジト":"secret hideout","近未来的な研究施設":"futuristic research facility","サイバーな繁華街":"cyberpunk entertainment district","ライブステージ":"live concert stage","撮影スタジオ":"photo studio","駅のホーム":"train station platform","古い洋館の廊下":"corridor of an old mansion","海辺の夕暮れ":"seaside at sunset","雪の降る街":"snowy city street","花が咲き乱れる庭園":"flower-filled garden","荒野の遺跡":"ruins in a wasteland","幻想的な星空の下":"under a fantastical starry sky","夜明けの街":"city at dawn","雲上の神殿":"celestial temple above the clouds",
+  "マイク":"microphone","ヘッドホン":"headphones","ピンバッジ":"pin badge","カメラ":"camera","フィルムカメラ":"film camera","手帳":"notebook","花束":"bouquet","万年筆":"fountain pen","カセットテープ":"cassette tape","腕時計":"wristwatch","スマートフォン":"smartphone","古い写真":"old photograph","本":"book","魔導書":"grimoire","魔法石":"magic stone","水晶":"crystal","小瓶":"small vial","聖印":"holy emblem","数珠":"prayer beads","ロザリオ":"rosary","宝石":"jewel","懐中時計":"pocket watch","ペンダントウォッチ":"pendant watch","扇子":"folding fan","手袋":"gloves","鍵":"key","タロットカード":"tarot cards","古いコイン":"old coin","お守り":"protective charm","チャーム":"charm","チョーカー":"choker","指輪":"ring","ペンダント":"pendant","リボン":"ribbon","ワイングラス":"wine glass","傘":"umbrella","メガネ":"glasses","マスク":"mask","羽根ペン":"quill pen",
+  "自然なポーズ":"natural pose"
 };
 function englishText(t){let s=String(t);Object.keys(EN).sort((a,b)=>b.length-a.length).forEach(k=>s=s.split(k).join(EN[k]));return s}
 function englishHair(t){return String(t).split(" × ").map(x=>englishText(x)).join(", ")}
 function englishPrompt(){
-  const subject=currentGender==="male"?"handsome young man":"beautiful young woman";
-  const accessories=[S.小物1,S.小物2].filter(x=>x!=="なし").map(englishText).join(", ");
-  return `${subject}, ${englishText(S.種族)}, ${englishText(S.役職)}, ${englishHair(S.髪型)}, ${S.髪色[0].toLowerCase()} hair, ${englishText(S.目)}, ${S.瞳色[0].toLowerCase()} eyes, ${englishText(S.服装スタイル)}, ${accessories?accessories+", ":""}${englishText(S.性格)}, ${englishText(S.ギャップ)}`;
+  const subject=currentGender==="male"?"(((solo,1man))), adult man, handsome":"(((solo,1woman))), adult woman, beautiful";
+  const accessories=S.小物1!=="なし"?englishText(S.小物1):"";
+  const palette=[
+    `(${S.MAIN[0].toLowerCase()}:1.1)`,
+    `(${S.SUB1[0].toLowerCase()}:0.3)`,
+    `(${S.SUB2[0].toLowerCase()}:0.3)`,
+    `(${S.ACCENT[0].toLowerCase()}:0.3)`
+  ].join(", ");
+  const poses=["standing with arms crossed","walking forward","sitting casually","looking over the shoulder","adjusting glasses","one hand in a pocket","holding the accessory naturally","turning slightly toward the viewer","leaning against a wall","confident standing pose"];
+  const angles=["three-quarter view","low angle","high angle","side angle","eye-level view","slightly tilted angle"];
+  const compositions=["dynamic composition","character-focused composition","cinematic composition","full-body composition","waist-up composition","environmental portrait"];
+  const pose=pick(poses), angle=pick(angles), composition=pick(compositions);
+  return `${subject}, ${englishText(S.種族)}, ${englishText(S.役職)}, ${englishHair(S.髪型)}, ${S.髪色[0].toLowerCase()} hair, ${englishText(S.目)}, ${S.瞳色[0].toLowerCase()} eyes, ${englishText(S.服装スタイル)}, ${accessories?accessories+", ":""}${englishText(S.性格)}, ${englishText(S.背景)}, ${pose}, ${angle}, ${composition}, ${palette}`;
 }
 document.querySelectorAll("[data-gender]").forEach(b=>b.onclick=()=>{gender=b.dataset.gender;document.querySelectorAll("[data-gender]").forEach(x=>x.classList.toggle("selected",x===b));generate(true)});
 document.getElementById("draw").onclick=()=>generate(true);
