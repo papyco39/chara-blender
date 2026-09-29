@@ -601,10 +601,10 @@ function englishPrompt(){
   const subject=currentGender==="male"?"(((solo,1man))), adult man, handsome":"(((solo,1woman))), adult woman, beautiful";
   const accessories=S.小物1!=="なし"?englishText(S.小物1):"";
   const palette=[
-    `(${S.MAIN[0].toLowerCase()}:1.1)`,
-    `(${S.SUB1[0].toLowerCase()}:0.3)`,
-    `(${S.SUB2[0].toLowerCase()}:0.3)`,
-    `(${S.ACCENT[0].toLowerCase()}:0.3)`
+    `(${S.MAIN[0].toLowerCase()} theme:1.1)`,
+    `(${S.SUB1[0].toLowerCase()} theme:0.3)`,
+    `(${S.SUB2[0].toLowerCase()} theme:0.3)`,
+    `(${S.ACCENT[0].toLowerCase()} theme:0.3)`
   ].join(", ");
   const poses=["standing with arms crossed","walking forward","sitting casually","looking over the shoulder","adjusting glasses","one hand in a pocket","holding the accessory naturally","turning slightly toward the viewer","leaning against a wall","confident standing pose"];
   const angles=["three-quarter view","low angle","high angle","side angle","eye-level view","slightly tilted angle"];
